@@ -21,6 +21,16 @@ td {
     height: 25px;
 }
 
+.reference-table th {
+    padding: 5px !important;
+    font-weight: bold;
+}
+
 .reference-table td.bg-success {
+    transition: background-color 0.3s ease;
+}
+
+.bg-marked {
+    background-color: #90EE90 !important;
     transition: background-color 0.3s ease;
 }

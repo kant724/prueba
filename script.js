@@ -57,6 +57,20 @@ function createReferenceTable() {
     const table = document.createElement('table');
     table.classList.add('table', 'table-sm', 'table-bordered', 'text-center');
     
+    // Agregar encabezado BINGO
+    const header = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['B', 'I', 'N', 'G', 'O'].forEach(letter => {
+        const th = document.createElement('th');
+        th.textContent = letter;
+        th.classList.add('bg-dark', 'text-white');
+        headerRow.appendChild(th);
+    });
+    header.appendChild(headerRow);
+    table.appendChild(header);
+    
+    // Crear el cuerpo de la tabla
+    const tbody = document.createElement('tbody');
     for (let i = 0; i < 15; i++) {
         const row = document.createElement('tr');
         for (let j = 0; j < 5; j++) {
@@ -67,8 +81,9 @@ function createReferenceTable() {
             cell.style.width = '20%';
             row.appendChild(cell);
         }
-        table.appendChild(row);
+        tbody.appendChild(row);
     }
+    table.appendChild(tbody);
     container.appendChild(table);
 }
 
@@ -96,7 +111,7 @@ document.getElementById('reset').addEventListener('click', () => {
     document.getElementById('drawn-numbers').innerHTML = '';
     document.getElementById('bingo-card').innerHTML = '';
     document.querySelectorAll('.reference-table td').forEach(cell => {
-        cell.classList.remove('bg-success', 'text-white');
+        cell.classList.remove('bg-marked');
     });
     gamesCount++;
     updateStats();
@@ -112,7 +127,7 @@ function updateStats() {
 function highlightNumberInReference(number) {
     const referenceCell = document.querySelector(`.reference-table td[data-number="${number}"]`);
     if (referenceCell) {
-        referenceCell.classList.add('bg-success', 'text-white');
+        referenceCell.classList.add('bg-marked');
     }
 }
 
