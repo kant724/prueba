@@ -44,6 +44,17 @@ export interface WinPattern {
     prize?: number;
 }
 
+export interface PatternSelection {
+    selectedPatterns: WinPattern[];
+    onPatternSelect: (pattern: WinPattern) => void;
+}
+
+export interface PatternDisplayProps {
+    pattern: boolean[][];
+    size?: number;
+    highlighted?: boolean;
+}
+
 export interface User {
     id: string;
     username: string;
@@ -65,4 +76,40 @@ export interface APIResponse<T> {
     data?: T;
     error?: string;
     timestamp: Date;
+}
+
+export type GameEventType = 
+    | 'gameStart' 
+    | 'numberDrawn' 
+    | 'playerJoined' 
+    | 'playerWon' 
+    | 'gameEnd';
+
+export interface GameEvent {
+    type: GameEventType;
+    payload: any;
+    timestamp: Date;
+}
+
+export interface GameEventListener {
+    (event: GameEvent): void;
+}
+
+export interface PlayerScore {
+    id: string;
+    username: string;
+    score: number;
+    gamesPlayed: number;
+    gamesWon: number;
+    patterns: {
+        [key: string]: number;  // patternName: timesWon
+    };
+}
+
+export interface GameScore {
+    timestamp: Date;
+    winner: string;
+    pattern: string;
+    players: string[];
+    pointsAwarded: number;
 }

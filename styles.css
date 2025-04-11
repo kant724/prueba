@@ -42,3 +42,31 @@ td {
 .players-cards .card-header {
     padding: 0.5rem 1rem;
 }
+
+.pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    margin: 10px 0;
+}
+
+.pattern-cell {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.pattern-cell.active {
+    background: #007bff;
+}
+
+.pattern-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pattern-card.selected {
+    border-color: #28a745;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+}
