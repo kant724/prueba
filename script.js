@@ -49,8 +49,64 @@ class Sorter {
     }
 }
 
+class BingoRoom {
+    constructor() {
+        this.players = new Map();
+        this.isGameStarted = false;
+    }
+
+    addPlayer(name) {
+        if (this.players.has(name)) {
+            return false;
+        }
+        this.players.set(name, {
+            card: cardGenerator.generateCard(),
+            marks: new Set()
+        });
+        this.updatePlayersView();
+        return true;
+    }
+
+    updatePlayersView() {
+        const container = document.getElementById('players-cards');
+        container.innerHTML = '';
+        
+        this.players.forEach((player, name) => {
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'col-md-6 col-lg-4';
+            playerDiv.innerHTML = `
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        ${name}
+                    </div>
+                    <div class="card-body p-2">
+                        ${this.createCardHTML(player.card)}
+                    </div>
+                </div>
+            `;
+            container.appendChild(playerDiv);
+        });
+        
+        document.getElementById('player-count').textContent = this.players.size;
+    }
+
+    createCardHTML(card) {
+        let html = '<table class="table table-bordered text-center">';
+        card.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                html += `<td class="${cell === null ? 'free-space bg-secondary text-white' : ''}">${cell !== null ? cell : ''}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</table>';
+        return html;
+    }
+}
+
 const cardGenerator = new CardGenerator();
 const sorter = new Sorter();
+const bingoRoom = new BingoRoom();
 
 function createReferenceTable() {
     const container = document.querySelector('.reference-table');
@@ -99,7 +155,11 @@ document.getElementById('draw-number').addEventListener('click', () => {
     if (number !== null) {
         displayDrawnNumbers(sorter.getDrawnNumbers());
         highlightNumberInReference(number);
-        highlightNumberOnCard(number);
+        bingoRoom.players.forEach(player => {
+            if (player.card.flat().includes(number)) {
+                player.marks.add(number);
+            }
+        });
         updateStats();
     } else {
         alert('¡Todos los números han sido sorteados!');
@@ -115,6 +175,21 @@ document.getElementById('reset').addEventListener('click', () => {
     });
     gamesCount++;
     updateStats();
+});
+
+document.getElementById('join-game').addEventListener('click', () => {
+    const nameInput = document.getElementById('player-name');
+    const playerName = nameInput.value.trim();
+    
+    if (playerName) {
+        if (bingoRoom.addPlayer(playerName)) {
+            nameInput.value = '';
+            nameInput.disabled = true;
+            document.getElementById('join-game').disabled = true;
+        } else {
+            alert('Ese nombre ya está en uso');
+        }
+    }
 });
 
 document.addEventListener('DOMContentLoaded', createReferenceTable);
