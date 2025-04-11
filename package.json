@@ -2,17 +2,17 @@
   "name": "bingo-app",
   "version": "1.0.0",
   "description": "Aplicación de Bingo",
-  "main": "dist/main.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "tsc && node dist/main.js",
-    "build": "tsc",
-    "dev": "ts-node-dev src/main.ts"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest"
   },
   "dependencies": {
-    "typescript": "^4.9.5"
+    "express": "^4.17.1",
+    "ws": "^8.2.3"
   },
   "devDependencies": {
-    "ts-node-dev": "^2.0.0",
-    "@types/node": "^18.0.0"
+    "nodemon": "^2.0.15"
   }
 }
