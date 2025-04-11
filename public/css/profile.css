@@ -1,0 +1,29 @@
+.achievement-card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.2s;
+}
+
+.achievement-card:hover {
+    transform: translateY(-5px);
+}
+
+.achievement-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.stats-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.game-history-item {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.game-history-item:last-child {
+    border-bottom: none;
+}
