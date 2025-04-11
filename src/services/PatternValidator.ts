@@ -1,6 +1,10 @@
 import { BingoCard, WinPattern } from '../types';
 
 export class PatternValidator {
+    static getDefaultPatterns(): WinPattern[] {
+        return [...PatternValidator.DEFAULT_PATTERNS];
+    }
+
     private static readonly DEFAULT_PATTERNS: WinPattern[] = [
         {
             name: 'Línea Horizontal',
@@ -21,6 +25,9 @@ export class PatternValidator {
     ];
 
     validatePattern(card: BingoCard, marks: Set<number>, pattern: WinPattern): boolean {
+        if (!card || !marks || !pattern) {
+            throw new Error('Parámetros inválidos para validación de patrón');
+        }
         return pattern.pattern.every((row, i) =>
             row.every((shouldBeMarked, j) =>
                 !shouldBeMarked || 

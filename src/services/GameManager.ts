@@ -6,6 +6,11 @@ import { EventManager } from './EventManager';
 import { ScoreManager } from './ScoreManager';
 
 export class GameManager {
+    private readonly MAX_RETRY_ATTEMPTS = 3;
+    private backupState: GameState | null = null;
+    private isProcessing: boolean = false;
+    private operationQueue: Array<() => Promise<void>> = [];
+
     private players: Map<string, Player>;
     private state: GameState;
     private cardGenerator: CardGenerator;
@@ -42,6 +47,9 @@ export class GameManager {
     }
 
     addPlayer(name: string): boolean {
+        if (!name || typeof name !== 'string') {
+            throw new Error('Nombre de jugador inválido');
+        }
         if (this.players.has(name)) return false;
         
         const player: Player = {
@@ -56,14 +64,81 @@ export class GameManager {
     }
 
     startGame(): boolean {
-        if (this.players.size < 2 || this.state.isStarted) return false;
-        
-        this.state.isStarted = true;
-        this.state.currentNumber = null;
-        this.state.drawnNumbers.clear();
-        this.numberDrawer.reset();
-        this.eventManager.emit('gameStart', { players: Array.from(this.players.keys()) });
-        return true;
+        try {
+            this.backupCurrentState();
+            if (!this.canStartGame()) {
+                return false;
+            }
+
+            this.initializeGameState();
+            this.eventManager.emit('gameStart', { 
+                players: Array.from(this.players.keys()),
+                timestamp: new Date()
+            });
+            return true;
+        } catch (error) {
+            this.restoreFromBackup();
+            throw new GameManagerError(`Error al iniciar juego: ${error.message}`);
+        }
+    }
+
+    private backupCurrentState(): void {
+        this.backupState = {
+            players: new Map(this.players),
+            state: { ...this.state },
+            currentNumber: this.state.currentNumber
+        };
+    }
+
+    private restoreFromBackup(): void {
+        if (this.backupState) {
+            this.players = new Map(this.backupState.players);
+            this.state = { ...this.backupState.state };
+        }
+    }
+
+    private retryOperation<T>(operation: () => T, retries = this.MAX_RETRY_ATTEMPTS): T {
+        let lastError;
+        for (let i = 0; i < retries; i++) {
+            try {
+                return operation();
+            } catch (error) {
+                lastError = error;
+                console.warn(`Intento ${i + 1} fallido:`, error);
+            }
+        }
+        throw lastError;
+    }
+
+    async processOperation<T>(operation: () => Promise<T>): Promise<T> {
+        if (this.isProcessing) {
+            return new Promise((resolve, reject) => {
+                this.operationQueue.push(async () => {
+                    try {
+                        const result = await operation();
+                        resolve(result);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        try {
+            this.isProcessing = true;
+            const result = await operation();
+            return result;
+        } finally {
+            this.isProcessing = false;
+            this.processQueue();
+        }
+    }
+
+    private async processQueue(): Promise<void> {
+        const nextOperation = this.operationQueue.shift();
+        if (nextOperation) {
+            await this.processOperation(nextOperation);
+        }
     }
 
     drawNumber(): number | null {
@@ -79,6 +154,9 @@ export class GameManager {
     }
 
     private checkWinners(number: number): void {
+        if (number < 1 || number > 75) {
+            throw new Error('Número fuera de rango válido');
+        }
         this.players.forEach(player => {
             if (this.hasNumberInCard(player.card, number)) {
                 player.marks.add(number);
