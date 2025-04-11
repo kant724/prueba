@@ -4,7 +4,12 @@ export type GameEventType =
     | 'playerJoined' 
     | 'patternSelected'
     | 'playerWon' 
-    | 'gameEnd';
+    | 'gameEnd'
+    | 'userLoggedIn'
+    | 'userLoggedOut'
+    | 'wsConnected'
+    | 'wsDisconnected'
+    | 'wsError';
 
 export interface GameEvent<T = any> {
     type: GameEventType;
