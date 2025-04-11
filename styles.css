@@ -1,0 +1,26 @@
+table {
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+td {
+    border: 1px solid #000;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1.2rem;
+}
+.free-space {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.reference-table td {
+    padding: 2px !important;
+    font-size: 0.8rem;
+    height: 25px;
+}
+
+.reference-table td.bg-success {
+    transition: background-color 0.3s ease;
+}
